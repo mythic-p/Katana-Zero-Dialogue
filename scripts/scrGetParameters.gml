@@ -11,7 +11,6 @@ var _textLength = string_length(_text) - _startIndex;
 _endIndex += string_pos(']', string_copy(_text, _startIndex + 1, _textLength));
 _textLength = _endIndex - (_startIndex + 1);
 _analyzedText = string_copy(_text, _startIndex + 1, _textLength);
-show_debug_message(_analyzedText);
 _textLength = string_length(_analyzedText);
 var _storedText = "", _nowArrayPos = -1;
 _parameters[++_nowArrayPos] = (_endIndex - _startIndex) + 1;

@@ -34,6 +34,9 @@ speaker = noone;
 rectSize[0] = 0; rectSize[1] = 0;
 targetRectSize[0] = 0; targetRectSize[1] = 0;
 rectPos[0] = 0; rectPos[1] = 0;
+// margin: 0 -&gt; top | 1 -&gt; down | 2 -&gt; left | 3 -&gt; right
+rectMargin[0] = 10; rectMargin[1] = 10;
+rectMargin[2] = 10; rectMargin[3] = 10;
 linearTime = 5;
 triSideLength = 5; triOffsetY = 8;
 // set the position of each side of triangle
@@ -48,6 +51,8 @@ for (var i = 0; i &lt; 3; i++)
 maximumWidth = 500;
 
 // animation
+animTotalSteps = 50;
+animStepCounter = 0;
 animOpen = false;
 animClose = false;
 
@@ -65,9 +70,13 @@ nextCharTimerAdditional = 0;
 nextCharInterval = 2;
 
 shaking = false;
-shakingType = 0;
+shakingType = -1;
 shakingDuration = -1;
+shakingTimer = 0;
 shakingVibration = 4;
+// record shake screen view
+shakingOriViewX = -1; shakingOriViewY = -1;
+shakingOffsetX = 0; shakingOffsetY = 0;
 
 floating = false;
 floatingVibration = 10;
@@ -102,8 +111,7 @@ alarm[0] = 1;
 ** "I'm white.\n\c[c_red]Now I become red!"
 
 * Do shake action: \s[shake_type, shake_duration]
-* shake_type: 0 - shake the screen | 1 - shake the dialogue | 2 - the following
-characters will be shaked.
+* shake_type: 0 - shake the screen | 1 - the following characters will be shaked.
 * shake_duration: (unit: step)
 
 * Change the following characters to floating or normal
@@ -194,9 +202,12 @@ triSideY[2] = _centerY - triOffsetY + 10;
 if animOpen || animClose
 {
     rectSize[0] = targetRectSize[0];
-    rectSize[1] += (targetRectSize[1] - rectSize[1]) / linearTime;
-    if rectSize[0] == targetRectSize[0] &amp;&amp; rectSize[1] == targetRectSize[1]
+    if animOpen rectSize[1] = EaseOutSine(animStepCounter / animTotalSteps, 0, targetRectSize[1], 1);
+    if animClose rectSize[1] = EaseOutSine(animStepCounter / animTotalSteps, targetRectSize[1], 0, 1);
+    animStepCounter++;
+    if animStepCounter == animTotalSteps
     {
+        animStepCounter = 0;
         if animClose
         {
             if ds_queue_empty(textSequence)
@@ -205,7 +216,9 @@ if animOpen || animClose
             }
             else
             {
+                animClose = 0;
                 event_user(1);
+                exit;
             }
         }
         animOpen = false;
@@ -242,6 +255,7 @@ else if curTextLength != -1
                             shakingType = real(_parameter[1]);
                             shakingDuration = real(_parameter[2]);
                             curTextCounter += 2 + _parameter[0];
+                            if shakingType == 0 shakingTimer = shakingDuration;
                         }
                         shaking = !shaking;
                         break;
@@ -265,7 +279,7 @@ else if curTextLength != -1
             }
             else
             {
-                var _inst = instance_create(rectPos[0] + textPosX, rectPos[1] + textPosY, obj_character);
+                var _inst = instance_create(rectPos[0] + rectMargin[2] + textPosX, rectPos[1] + rectMargin[0] + textPosY, obj_character);
                 _inst.depth = depth - 1;
                 if curTextColor == 99999 _inst.rainbowColor = true;
                 else _inst.color = curTextColor;
@@ -316,8 +330,60 @@ else if curTextLength != -1
           <argument>
             <kind>1</kind>
             <string>/// Roundrect position refreshing
-rectPos[0] = triSideX[0] - rectSize[0] / 2;
-rectPos[1] = triSideY[1] - rectSize[1];
+rectPos[0] = triSideX[0] - rectSize[0] / 2 - rectMargin[2];// x position
+rectPos[1] = triSideY[1] - rectSize[1];// y position
+</string>
+          </argument>
+        </arguments>
+      </action>
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>/// Shake
+if shakingTimer
+{
+    switch shakingType
+    {
+        case 0: // shake the screen.
+            if shakingOriViewX == -1
+            {
+                shakingOriViewX = view_xview[view_current];
+                shakingOriViewY = view_yview[view_current];
+            }
+            view_xview[view_current] = random_range(-abs(shakingVibration), abs(shakingVibration));
+            view_yview[view_current] = random_range(-abs(shakingVibration), abs(shakingVibration));
+            break;
+    }
+    shakingTimer--;
+}
+else
+{
+    if shakingTimer == 0
+    {
+        switch shakingType
+        {
+            case 0: // shake the screen.
+                // reset the view
+                view_xview[view_current] = shakingOriViewX;
+                view_yview[view_current] = shakingOriViewY;
+                break;
+        }
+        shakingTimer = -1;
+    }
+}
 </string>
           </argument>
         </arguments>
@@ -345,8 +411,16 @@ curText = ds_queue_dequeue(textSequence);
 curTextLength = string_length(curText);
 curTextCounter = 1;
 nextCharTimer = 0;
-// start open animation
+// re-calculate rect size
 targetRectSize = scrCalculateRect(curText, maximumWidth);
+targetRectSize[0] += rectMargin[2] + rectMargin[3];
+targetRectSize[1] += rectMargin[0] + rectMargin[1];
+// reset parameters.
+textPosX = 0; textPosY = 0;
+curTextColor = c_white;
+shaking = 0; shakingType = -1; shakingDuration = -1;
+floating = 0;
+// start open animation
 animOpen = 1;
 </string>
           </argument>
@@ -374,14 +448,14 @@ animOpen = 1;
 // Let all letters fade
 with obj_character event_user(0);
 // reset the size of dialogue width
-targetRectSize[1] = 0;
+//targetRectSize[1] = 0;
 animClose = 1;
 </string>
           </argument>
         </arguments>
       </action>
     </event>
-    <event eventtype="8" enumb="64">
+    <event eventtype="8" enumb="0">
       <action>
         <libid>1</libid>
         <id>603</id>
@@ -398,10 +472,7 @@ animClose = 1;
         <arguments>
           <argument>
             <kind>1</kind>
-            <string>// draw roundrect
-// set paddings
-var padding_left = 10, padding_right = 10, padding_up = 10, padding_down = 10;
-// start drawing
+            <string>// start drawing
 // reset draw parameter
 draw_set_alpha(1);
 draw_set_color(c_white);

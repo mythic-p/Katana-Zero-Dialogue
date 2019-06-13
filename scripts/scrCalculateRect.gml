@@ -30,7 +30,7 @@ for (var i = 1; i <= string_length(_text); i++)
                 var __startIndex = i + 1;
                 var __endIndex = __startIndex;
                 var __textLength = string_length(_text) - __startIndex;
-                __endIndex += string_pos(']', string_copy(_text, __startIndex + 1, __textLength)) - 1;
+                __endIndex += string_pos(']', string_copy(_text, __startIndex + 1, __textLength)) + 1;
                 i += (__endIndex - __startIndex);
                 break;
         }

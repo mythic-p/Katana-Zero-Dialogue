@@ -52,7 +52,7 @@ draw_text(0,32,string(instance_number(obj_character)));
           <argument>
             <kind>1</kind>
             <string>var tmp;
-tmp[0] = "中文测试..\n\c[red]红色测试。\c[white]\n\f浮动测试。\n\f\s[2,40]震动40步测试。\s\n\t[80]等待80步后\n\c[rainbow]彩虹色字体。";
+tmp[0] = "喂，\t[30]小的们，\t[10]是时候\c[red]\s[1,-1]清理垃圾了。\t[10]\c[ltyellow]注意激光啊。"
 scrInitDialogue(tmp);
 </string>
           </argument>
