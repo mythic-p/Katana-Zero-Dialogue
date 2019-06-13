@@ -5,9 +5,29 @@
   </Configs>
   <NewExtensions/>
   <sounds name="sound"/>
-  <sprites name="sprites"/>
+  <sprites name="sprites">
+    <sprite>sprites\sprKid</sprite>
+  </sprites>
   <backgrounds name="background"/>
   <paths name="paths"/>
+  <scripts name="scripts">
+    <script>scripts\scrInitDialogue.gml</script>
+    <script>scripts\scrDialogueDraw.gml</script>
+    <script>scripts\scrCalculateRect.gml</script>
+    <script>scripts\scrGetParameters.gml</script>
+    <script>scripts\scrGetColorFromString.gml</script>
+  </scripts>
+  <fonts name="fonts">
+    <font>fonts\fntDialogue</font>
+  </fonts>
+  <objects name="objects">
+    <object>objects\obj_dialogue</object>
+    <object>objects\obj_character</object>
+    <object>objects\obj_kid</object>
+  </objects>
+  <rooms name="rooms">
+    <room>rooms\rTest</room>
+  </rooms>
   <help>
     <rtf>help.rtf</rtf>
   </help>
