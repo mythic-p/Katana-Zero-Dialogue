@@ -20,6 +20,7 @@ for (var i = 1; i <= string_length(_text); i++)
             case 's':
             case 'c':
             case 't':
+            case 'p':
                 // set the state of shake command
                 if _nextLetter == 's'
                 {

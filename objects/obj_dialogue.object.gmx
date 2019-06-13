@@ -29,6 +29,7 @@
 textSequence = ds_queue_create();
 
 speaker = noone;
+newSpeaker = noone;
 
 // roundrect
 rectSize[0] = 0; rectSize[1] = 0;
@@ -51,7 +52,7 @@ for (var i = 0; i &lt; 3; i++)
 maximumWidth = 500;
 
 // animation
-animTotalSteps = 50;
+animTotalSteps = 25;
 animStepCounter = 0;
 animOpen = false;
 animClose = false;
@@ -121,6 +122,9 @@ alarm[0] = 1;
 * wait_time: (unit: step)
 ** I'm normal.\nI will wait for (nextCharInterval + wait_time) steps.\t[25]\nOver!
 
+* Change the speaker: \p[instance_name]
+* instance_name: the name of current dialogue speaker.(Make sure the number of speaker must be 1!)
+
 */
 </string>
           </argument>
@@ -168,14 +172,7 @@ alarm[0] = 1;
           <argument>
             <kind>1</kind>
             <string>/// Initialize triangle
-var _centerX = speaker.bbox_left + ((speaker.bbox_right - speaker.bbox_left) / 2);
-var _centerY = speaker.bbox_top;
-triSideX[0] = _centerX + lengthdir_x(triSideLength, 60);
-triSideY[0] = _centerY - triOffsetY - lengthdir_y(triSideLength, 60);
-triSideX[1] = _centerX + lengthdir_x(triSideLength, 120);
-triSideY[1] = _centerY - triOffsetY - lengthdir_y(triSideLength, 120);
-triSideX[2] = _centerX;
-triSideY[2] = _centerY - triOffsetY + 10;
+event_user(2);
 </string>
           </argument>
         </arguments>
@@ -216,6 +213,12 @@ if animOpen || animClose
             }
             else
             {
+                if newSpeaker != noone
+                {
+                    speaker = newSpeaker;
+                    newSpeaker = noone;
+                    event_user(2);
+                }
                 animClose = 0;
                 event_user(1);
                 exit;
@@ -271,6 +274,11 @@ else if curTextLength != -1
                     case 't': // wait for more time.
                         var _parameter = scrGetParameters(curText, curTextCounter + 2);
                         nextCharTimerAdditional = real(_parameter[1]);
+                        curTextCounter += 2 + _parameter[0];
+                        break;
+                    case 'p': // change the speaker
+                        var _parameter = scrGetParameters(curText, curTextCounter + 2);
+                        newSpeaker = instance_find(asset_get_index(_parameter[1]), 0);
                         curTextCounter += 2 + _parameter[0];
                         break;
                     default:
@@ -384,6 +392,37 @@ else
         shakingTimer = -1;
     }
 }
+</string>
+          </argument>
+        </arguments>
+      </action>
+    </event>
+    <event eventtype="7" enumb="12">
+      <action>
+        <libid>1</libid>
+        <id>603</id>
+        <kind>7</kind>
+        <userelative>0</userelative>
+        <isquestion>0</isquestion>
+        <useapplyto>-1</useapplyto>
+        <exetype>2</exetype>
+        <functionname></functionname>
+        <codestring></codestring>
+        <whoName>self</whoName>
+        <relative>0</relative>
+        <isnot>0</isnot>
+        <arguments>
+          <argument>
+            <kind>1</kind>
+            <string>// reset the position of dialogue
+var _centerX = speaker.bbox_left + ((speaker.bbox_right - speaker.bbox_left) / 2);
+var _centerY = speaker.bbox_top;
+triSideX[0] = _centerX + lengthdir_x(triSideLength, 60);
+triSideY[0] = _centerY - triOffsetY - lengthdir_y(triSideLength, 60);
+triSideX[1] = _centerX + lengthdir_x(triSideLength, 120);
+triSideY[1] = _centerY - triOffsetY - lengthdir_y(triSideLength, 120);
+triSideX[2] = _centerX;
+triSideY[2] = _centerY - triOffsetY + 10;
 </string>
           </argument>
         </arguments>
