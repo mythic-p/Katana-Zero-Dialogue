@@ -27,8 +27,11 @@
             <kind>1</kind>
             <string>image_alpha = 0;
 letter = '';
+iconSpr = -1;
+iconIndex = 0;
 color = c_white;
 rainbowColor = false; rainbowHue = 0;
+gradientColor = -1;
 font = fntDialogue;
 shake = false;
 shakeMagnitude = 1;
@@ -137,8 +140,26 @@ else
 draw_set_valign(fa_top);
 draw_set_font(font);
 draw_set_alpha(image_alpha);
-draw_set_color(color);
-draw_text_transformed(x, y, letter, image_xscale, image_yscale, image_angle);
+if letter != ''
+{
+    if gradientColor == -1
+    {
+        draw_set_color(color);
+        draw_text_transformed(x, y, letter, image_xscale, image_yscale, image_angle);
+    }
+    else
+    {
+        draw_text_transformed_color(x, y, letter, image_xscale, image_yscale, image_angle, c_white, c_white, gradientColor, gradientColor, image_alpha);
+    }
+}
+else
+{
+    
+    if sprite_exists(iconSpr)
+    {
+        draw_sprite_ext(iconSpr, iconIndex, x, y - sprite_get_xoffset(iconSpr), image_xscale, image_yscale, image_angle, c_white, image_alpha);
+    }
+}
 draw_set_alpha(1);
 draw_set_color(c_white);
 </string>

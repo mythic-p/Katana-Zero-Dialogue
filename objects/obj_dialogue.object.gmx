@@ -65,6 +65,10 @@ curText = "";
 curTextLength = -1;
 curTextCounter = 1;
 curTextColor = c_white;
+curTextGradient = false;
+
+iconSpr = -1;
+iconIndex = 0;
 
 nextCharTimer = 0;
 nextCharTimerAdditional = 0;
@@ -109,7 +113,7 @@ alarm[0] = 1;
 ** "I'm a text\nOh A NEW LINE!"
 
 * Change the text color: \c[color_name]
-** "I'm white.\n\c[c_red]Now I become red!"
+** "I'm white.\n\c[red]Now I become red!"
 
 * Do shake action: \s[shake_type, shake_duration]
 * shake_type: 0 - shake the screen | 1 - the following characters will be shaked.
@@ -124,6 +128,12 @@ alarm[0] = 1;
 
 * Change the speaker: \p[instance_name]
 * instance_name: the name of current dialogue speaker.(Make sure the number of speaker must be 1!)
+
+* Change the color of following characters to be gradient: \g[color_name]
+** You wanna be a \g[c_ltyellow]LEGEND\g?
+
+* display an icon: \i[icon_name, icon_image_index]
+** Here is a battle icon!\n\i[sprUITutorial,0]
 
 */
 </string>
@@ -281,6 +291,25 @@ else if curTextLength != -1
                         newSpeaker = instance_find(asset_get_index(_parameter[1]), 0);
                         curTextCounter += 2 + _parameter[0];
                         break;
+                    case 'g': // change following character's colors to be gradient
+                        if curTextGradient
+                        {
+                            curTextCounter += 2;
+                        }
+                        else
+                        {
+                            var _parameter = scrGetParameters(curText, curTextCounter + 2);
+                            curTextColor = scrGetColorFromString(_parameter[1]);
+                            curTextCounter += 2 + _parameter[0];
+                        }
+                        curTextGradient = !curTextGradient;
+                        break;
+                    case 'i':
+                        var _parameter = scrGetParameters(curText, curTextCounter + 2);
+                        iconSpr = asset_get_index(_parameter[1]);
+                        iconIndex = _parameter[2];
+                        curTextCounter += 2 + _parameter[0];
+                        break;
                     default:
                         show_error('Unknown command!', 1);
                 }
@@ -289,13 +318,41 @@ else if curTextLength != -1
             {
                 var _inst = instance_create(rectPos[0] + rectMargin[2] + textPosX, rectPos[1] + rectMargin[0] + textPosY, obj_character);
                 _inst.depth = depth - 1;
-                if curTextColor == 99999 _inst.rainbowColor = true;
-                else _inst.color = curTextColor;
-                _inst.letter = _char;
-                if shaking &amp;&amp; shakingType == 2 _inst.shake = 1;
+                if curTextColor == 99999
+                {
+                    _inst.rainbowColor = true;
+                }
+                else
+                {
+                    if curTextGradient
+                    {
+                        _inst.gradientColor = curTextColor;
+                    }
+                    else
+                    {
+                        _inst.color = curTextColor;
+                    }
+                }
+                if iconSpr &gt;= 0
+                {
+                    _inst.iconSpr = iconSpr;
+                    _inst.iconIndex = iconIndex;
+                    textPosX += sprite_get_width(iconSpr) - sprite_get_xoffset(iconSpr);
+                    iconSpr = -1;
+                    iconIndex = 0;
+                }
+                else
+                {
+                    _inst.letter = _char;
+                    textPosX += string_width(_char);
+                }
+                
+                if shaking &amp;&amp; shakingType == 2
+                {
+                    _inst.shake = 1;
+                }
                 _inst.shakeDuration = shakingDuration;
                 _inst.float = floating;
-                textPosX += string_width(_char);
                 curTextCounter++;
             }
             nextCharTimer = nextCharInterval;

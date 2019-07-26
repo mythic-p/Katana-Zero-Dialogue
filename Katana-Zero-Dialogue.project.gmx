@@ -8,6 +8,7 @@
   <sprites name="sprites">
     <sprite>sprites\sprKid</sprite>
     <sprite>sprites\sprKid2</sprite>
+    <sprite>sprites\sprTutorial</sprite>
   </sprites>
   <backgrounds name="background"/>
   <paths name="paths"/>

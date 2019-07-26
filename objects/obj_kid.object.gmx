@@ -52,8 +52,8 @@ draw_text(0,32,string(instance_number(obj_character)));
           <argument>
             <kind>1</kind>
             <string>var tmp;
-tmp[0] = "\p[obj_kid2]喂，\t[30]小的们，\t[10]是时候\c[red]\s[1,-1]清理垃圾了。\t[10]\c[ltyellow]注意激光啊。"
-tmp[1] = "我是kid二号，\t[15]这里是最后一段话。"
+tmp[0] = "\p[obj_kid2]图标测试\i[sprTutorial,0]。"
+tmp[1] = "\g[yellow]淡黄色渐变测试。\g"
 scrInitDialogue(tmp);
 </string>
           </argument>

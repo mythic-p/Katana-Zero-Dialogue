@@ -21,11 +21,19 @@ for (var i = 1; i <= string_length(_text); i++)
             case 'c':
             case 't':
             case 'p':
+            case 'g':
+            case 'i':
                 // set the state of shake command
                 if _nextLetter == 's'
                 {
                     _shakeState = !_shakeState;
                     if !_shakeState continue;
+                }
+                else if _nextLetter == 'i'
+                {
+                    var _parameters = scrGetParameters(_text, i + 1);
+                    var _icon = _parameters[1];
+                    _size[0] += sprite_get_width(_icon) - sprite_get_xoffset(_icon);
                 }
                 // find the position of parameter section
                 var __startIndex = i + 1;
