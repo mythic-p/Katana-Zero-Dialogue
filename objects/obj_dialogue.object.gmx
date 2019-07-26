@@ -308,7 +308,7 @@ else if curTextLength != -1
                         var _parameter = scrGetParameters(curText, curTextCounter + 2);
                         iconSpr = asset_get_index(_parameter[1]);
                         iconIndex = _parameter[2];
-                        curTextCounter += 2 + _parameter[0];
+                        curTextCounter += 1 + _parameter[0];
                         break;
                     default:
                         show_error('Unknown command!', 1);

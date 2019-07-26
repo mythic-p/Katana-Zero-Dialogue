@@ -46,6 +46,7 @@ for (var i = 1; i <= string_length(_text); i++)
     }
     else
     {
+        show_debug_message(_letter)
         var _width = string_width(_letter);
         if _curWidth + _width >= _wrapWidth
         {
